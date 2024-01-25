@@ -4,15 +4,42 @@ pub mod calculator_functions;
 pub mod closures;
 pub mod modules;
 pub mod optiontest;
+pub mod structs;
 fn main() {
     println!("Hello, world!");
     // modules::helper::greet();
     // closures::closures();
-    let result = optiontest::test_option();
-    println!("{}", result.unwrap());
-    calculator();
+    // let result = optiontest::test_option();
+    // println!("{}", result.unwrap());
+    // calculator();
+    let student1 = structs::Student::create_student(
+        "Gerson".to_string(),
+        22,
+        "geloaiza@estudiantec.cr".to_string(),
+    );
+    let student2 = structs::Student::create_student(
+        "Daniel".to_string(),
+        21,
+        "daniel@estudiantec.cr".to_string(),
+    );
+    let student3 = structs::Student::create_student(
+        "Josue".to_string(),
+        21,
+        "josue@estudiantec.cr".to_string(),
+    );
+    let mut student_list = structs::StudenList::new();
+    student_list.add_student(student1);
+    student_list.add_student(student2);
+    student_list.add_student(student3);
+
+    let all_students = student_list.get_all_students();
+
+    for student in all_students {
+        println!("{:?}", student);
+    }
 }
 
+#[allow(dead_code)]
 fn calculator() {
     println!("=====================================================");
     println!("Welcome to my basic calculator!");
