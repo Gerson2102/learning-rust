@@ -1,6 +1,5 @@
-workspace = { members = ["substrate/rust-state-machine"] }
 [package]
-name = "modules-intro"
+name = "rust-state-machine"
 version = "0.1.0"
 edition = "2021"
 
