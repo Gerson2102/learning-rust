@@ -26,6 +26,45 @@ impl Pallet {
     pub fn balance(&self, who: &String) -> u128 {
         *self.balances.get(who).unwrap_or(&0)
     }
+
+    /// Transfer `amount` from one account to another.
+    /// This function verifies that `from` has at least `amount` balance to transfer,
+    /// and that no mathematical overflows occur.
+    pub fn transfer(
+        &mut self,
+        caller: String,
+        to: String,
+        amount: u128,
+    ) -> Result<(), &'static str> {
+        /* TODO:
+            - Get the balance of account `caller`.
+            - Get the balance of account `to`.
+
+            - Use safe math to calculate a `new_caller_balance`.
+            - Use safe math to calculate a `new_to_balance`.
+
+            - Insert the new balance of `caller`.
+            - Insert the new balance of `to`.
+        */
+
+        /// - Get the balance of account `caller`.
+        let caller_balance = self.balance(&caller);
+        ///- Get the balance of account `to`.
+        let to_balance = self.balance(&to);
+        /// - Use safe math to calculate a `new_caller_balance`.
+        let new_caller_balance = caller_balance
+            .checked_sub(amount)
+            .ok_or("Underflow because of substraction!")?;
+        ///- Use safe math to calculate a `new_to_balance`.
+        let new_to_balance = to_balance
+            .checked_add(amount)
+            .ok_or("Overflow because of addition!")?;
+
+        self.set_balance(&caller, new_caller_balance);
+        self.set_balance(&to, new_to_balance);
+
+        Ok(())
+    }
 }
 
 #[cfg(test)]
@@ -45,5 +84,14 @@ mod tests {
         assert_eq!(balances.balance(&"bob".to_string()), 0);
         /* TODO: Assert the balance of `bob` has not changed and is 0. */
         assert_eq!(balances.balance(&"alice".to_string()), 100);
+    }
+
+    #[test]
+    fn transfer_balance() {
+        /* TODO: Create a test that checks the following:
+            - That `alice` cannot transfer funds she does not have.
+            - That `alice` can successfully transfer funds to `bob`.
+            - That the balance of `alice` and `bob` is correctly updated.
+        */
     }
 }
