@@ -1,4 +1,15 @@
+/*
+    TODO: Define the common types used in this pallet:
+        - `AccountID`
+        - `Balance`
+
+    Then update this pallet to use these common types.
+*/
+
 use std::collections::BTreeMap;
+
+type AccountId = String;
+type Balance = u128;
 
 /// This is the Balances Module.
 /// It is a simple module which keeps track of how much balance each account has in this state
@@ -7,7 +18,7 @@ use std::collections::BTreeMap;
 #[derive(Debug)]
 pub struct Pallet {
     // A simple storage mapping from accounts (`String`) to their balances (`u128`).
-    balances: BTreeMap<String, u128>,
+    balances: BTreeMap<AccountId, Balance>,
 }
 
 impl Pallet {
@@ -19,13 +30,13 @@ impl Pallet {
     }
 
     /// Set the balance of an account `who` to some `amount`.
-    pub fn set_balance(&mut self, who: &String, amount: u128) {
+    pub fn set_balance(&mut self, who: &AccountId, amount: u128) {
         self.balances.insert(who.clone(), amount);
     }
 
     /// Get the balance of an account `who`.
     /// If the account has no stored balance, we return zero.
-    pub fn balance(&self, who: &String) -> u128 {
+    pub fn balance(&self, who: &AccountId) -> Balance {
         *self.balances.get(who).unwrap_or(&0)
     }
 
@@ -34,9 +45,9 @@ impl Pallet {
     /// and that no mathematical overflows occur.
     pub fn transfer(
         &mut self,
-        caller: String,
-        to: String,
-        amount: u128,
+        caller: AccountId,
+        to: AccountId,
+        amount: Balance,
     ) -> Result<(), &'static str> {
         /* TODO:
             - Get the balance of account `caller`.
@@ -49,26 +60,26 @@ impl Pallet {
             - Insert the new balance of `to`.
         */
 
-        /// - Get the balance of account `caller`.
+        // - Get the balance of account `caller`.
         let caller_balance = self.balance(&caller);
-        ///- Get the balance of account `to`.
+        //- Get the balance of account `to`.
         let to_balance = self.balance(&to);
 
         if caller_balance < amount {
             return Err("Insufficient balance for transfer");
         }
 
-        /// - Use safe math to calculate a `new_caller_balance`.
+        // - Use safe math to calculate a `new_caller_balance`.
         let new_caller_balance = caller_balance
             .checked_sub(amount)
             .ok_or("Underflow because of substraction!")?;
-        ///- Use safe math to calculate a `new_to_balance`.
+        //- Use safe math to calculate a `new_to_balance`.
         let new_to_balance = to_balance
             .checked_add(amount)
             .ok_or("Overflow because of addition!")?;
-        /// - Insert the new balance of `caller`.
+        // - Insert the new balance of `caller`.
         self.balances.insert(caller, new_caller_balance);
-        /// - Insert the new balance of `to`.
+        // - Insert the new balance of `to`.
         self.balances.insert(to, new_to_balance);
 
         Ok(())
