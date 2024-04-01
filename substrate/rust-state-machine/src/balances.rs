@@ -51,6 +51,11 @@ impl Pallet {
         let caller_balance = self.balance(&caller);
         ///- Get the balance of account `to`.
         let to_balance = self.balance(&to);
+
+        if caller_balance < amount {
+            return Err("Insufficient balance for transfer");
+        }
+
         /// - Use safe math to calculate a `new_caller_balance`.
         let new_caller_balance = caller_balance
             .checked_sub(amount)
@@ -59,9 +64,10 @@ impl Pallet {
         let new_to_balance = to_balance
             .checked_add(amount)
             .ok_or("Overflow because of addition!")?;
-
-        self.set_balance(&caller, new_caller_balance);
-        self.set_balance(&to, new_to_balance);
+        /// - Insert the new balance of `caller`.
+        self.balances.insert(caller, new_caller_balance);
+        /// - Insert the new balance of `to`.
+        self.balances.insert(to, new_to_balance);
 
         Ok(())
     }
@@ -93,5 +99,17 @@ mod tests {
             - That `alice` can successfully transfer funds to `bob`.
             - That the balance of `alice` and `bob` is correctly updated.
         */
+        let mut balances = Pallet::new();
+        balances.set_balance(&"alice".to_string(), 50);
+
+        let result = balances.transfer("alice".to_string(), "bob".to_string(), 100);
+        assert_eq!(result, Err("Insufficient balance for transfer"));
+        assert_eq!(balances.balance(&"alice".to_string()), 50);
+        assert_eq!(balances.balance(&"bob".to_string()), 0);
+
+        let result2 = balances.transfer("alice".to_string(), "bob".to_string(), 25);
+        assert!(result2.is_ok());
+        assert_eq!(balances.balance(&"alice".to_string()), 25);
+        assert_eq!(balances.balance(&"bob".to_string()), 25);
     }
 }
