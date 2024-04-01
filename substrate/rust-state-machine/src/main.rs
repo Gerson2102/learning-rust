@@ -3,6 +3,8 @@ mod system;
 
 // This is our main Runtime.
 // It accumulates all of the different pallets we want to use.
+/* TODO: Add the derive macro to implement the `Debug` trait for `Runtime`. */
+#[derive(Debug)]
 pub struct Runtime {
     system: system::Pallet,
     balances: balances::Pallet,
@@ -51,4 +53,6 @@ fn main() {
         .balances
         .transfer("alice".to_string(), "charlie".to_string(), 20)
         .map_err(|e| eprintln!("{}", e));
+
+    println!("{:?}", runtime);
 }
