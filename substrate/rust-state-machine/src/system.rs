@@ -46,6 +46,7 @@ impl Pallet {
 
 #[cfg(test)]
 mod test {
+    pub use crate::system::Pallet;
     #[test]
     fn init_system() {
         /* TODO: Create a test which checks the following:
@@ -54,5 +55,12 @@ mod test {
             - Check the block number is what we expect.
             - Check the nonce of `alice` is what we expect.
         */
+        let mut system = Pallet::new();
+        system.inc_block_number();
+        system.inc_nonce(&"alice".to_string());
+
+        assert_eq!(system.block_number, 1);
+        assert_eq!(system.nonce.get(&"alice".to_string()), Some(&1));
+        assert_eq!(system.nonce.get(&"bob".to_string()), None);
     }
 }
