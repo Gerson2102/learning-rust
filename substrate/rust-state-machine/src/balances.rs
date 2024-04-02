@@ -1,40 +1,22 @@
+use num::traits::{CheckedAdd, CheckedSub, Zero};
 use std::collections::BTreeMap;
+use std::marker::Copy;
 
-/*
-    TODO:
-    Update the `Pallet` struct to be generic over the `AccountId` and `Balance` type.
-
-    You won't need the type definitions above after you are done.
-    Types will now be defined in `main.rs`. See the TODOs there.
-*/
+pub trait Config {
+    type AccountId: Ord + Clone;
+    type Balance: Zero + CheckedSub + CheckedAdd + Copy + std::cmp::PartialOrd;
+}
 /// This is the Balances Module.
 /// It is a simple module which keeps track of how much balance each account has in this state
 /// machine.
 /* TODO: Add the derive macro to implement the `Debug` trait for `Pallet`. */
 #[derive(Debug)]
-pub struct Pallet<AccountId, Balance> {
+pub struct Pallet<T: Config> {
     // A simple storage mapping from accounts (`String`) to their balances (`u128`).
-    balances: BTreeMap<AccountId, Balance>,
+    balances: BTreeMap<T::AccountId, T::Balance>,
 }
 
-/*
-    TODO:
-    The generic types need to satisfy certain traits in order to be used in the functions below.
-        - AccountId: Ord
-        - Balance: Zero + CheckedSub + CheckedAdd + Copy
-
-    You could figure these traits out yourself by letting the compiler tell you what you're missing.
-
-    NOTE: You might need to adjust some of the functions below to satisfy the borrow checker.
-*/
-use num::traits::{CheckedAdd, CheckedSub, Zero};
-use std::marker::Copy;
-
-impl<AccountId, Balance> Pallet<AccountId, Balance>
-where
-    AccountId: Ord + Clone,
-    Balance: Zero + CheckedSub + CheckedAdd + Copy + std::cmp::PartialOrd,
-{
+impl<T: Config> Pallet<T> {
     /// Create a new instance of the balances module.
     pub fn new() -> Self {
         Self {
@@ -43,14 +25,14 @@ where
     }
 
     /// Set the balance of an account `who` to some `amount`.
-    pub fn set_balance(&mut self, who: &AccountId, amount: Balance) {
+    pub fn set_balance(&mut self, who: &T::AccountId, amount: T::Balance) {
         self.balances.insert(who.clone(), amount);
     }
 
     /// Get the balance of an account `who`.
     /// If the account has no stored balance, we return zero.
-    pub fn balance(&self, who: &AccountId) -> Balance {
-        *self.balances.get(who).unwrap_or(&Balance::zero())
+    pub fn balance(&self, who: &T::AccountId) -> T::Balance {
+        *self.balances.get(who).unwrap_or(&T::Balance::zero())
     }
 
     /// Transfer `amount` from one account to another.
@@ -58,9 +40,9 @@ where
     /// and that no mathematical overflows occur.
     pub fn transfer(
         &mut self,
-        caller: AccountId,
-        to: AccountId,
-        amount: Balance,
+        caller: T::AccountId,
+        to: T::AccountId,
+        amount: T::Balance,
     ) -> Result<(), &'static str> {
         /* TODO:
             - Get the balance of account `caller`.
@@ -102,11 +84,17 @@ where
 #[cfg(test)]
 mod tests {
     pub use crate::balances::Pallet;
-    #[test]
 
+    pub struct TestConfig;
+    impl super::Config for TestConfig {
+        type AccountId = String;
+        type Balance = u128;
+    }
+
+    #[test]
     fn init_balances() {
         /* TODO: Create a mutable variable `balances`, which is a new instance of `Pallet`. */
-        let mut balances = Pallet::<String, u128>::new();
+        let mut balances = Pallet::<TestConfig>::new();
 
         /* TODO: Assert that the balance of `alice` starts at zero. */
         assert_eq!(balances.balance(&"alice".to_string()), 0);
@@ -129,7 +117,7 @@ mod tests {
             TODO:
             When creating an instance of `Pallet`, you should explicitly define the types you use.
         */
-        let mut balances = Pallet::<String, u128>::new();
+        let mut balances = Pallet::<TestConfig>::new();
 
         balances.set_balance(&"alice".to_string(), 50);
         let result = balances.transfer("alice".to_string(), "bob".to_string(), 100);

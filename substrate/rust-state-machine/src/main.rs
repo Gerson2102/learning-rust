@@ -16,7 +16,7 @@ mod types {
 #[derive(Debug)]
 pub struct Runtime {
     system: system::Pallet<Self>,
-    balances: balances::Pallet<String, u128>,
+    balances: balances::Pallet<Self>,
     /* TODO: Move your type definitions for `BlockNumber` and `Nonce` here. */
 }
 
@@ -24,6 +24,11 @@ impl system::Config for Runtime {
     type AccountId = String;
     type BlockNumber = u32;
     type Nonce = u32;
+}
+
+impl balances::Config for Runtime {
+    type AccountId = String;
+    type Balance = u128;
 }
 
 impl Runtime {
