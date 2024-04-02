@@ -15,9 +15,15 @@ mod types {
 /* TODO: Add the derive macro to implement the `Debug` trait for `Runtime`. */
 #[derive(Debug)]
 pub struct Runtime {
-    system: system::Pallet<String, u32, u32>,
+    system: system::Pallet<Self>,
     balances: balances::Pallet<String, u128>,
     /* TODO: Move your type definitions for `BlockNumber` and `Nonce` here. */
+}
+
+impl system::Config for Runtime {
+    type AccountId = String;
+    type BlockNumber = u32;
+    type Nonce = u32;
 }
 
 impl Runtime {
