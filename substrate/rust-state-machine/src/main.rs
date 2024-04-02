@@ -1,13 +1,23 @@
 mod balances;
 mod system;
 
+mod types {
+    /*
+        TODO: Move your type definitions for `AccountId` and `Balance` here.
+    */
+    pub type AccountId = String;
+    pub type Balance = u128;
+    pub type BlockNumber = u32;
+    pub type Nonce = u32;
+}
 // This is our main Runtime.
 // It accumulates all of the different pallets we want to use.
 /* TODO: Add the derive macro to implement the `Debug` trait for `Runtime`. */
 #[derive(Debug)]
 pub struct Runtime {
-    system: system::Pallet,
-    balances: balances::Pallet,
+    system: system::Pallet<String, u32, u32>,
+    balances: balances::Pallet<String, u128>,
+    /* TODO: Move your type definitions for `BlockNumber` and `Nonce` here. */
 }
 
 impl Runtime {
@@ -37,7 +47,7 @@ fn main() {
     runtime.system.inc_nonce(&"alice".to_string());
     /* TODO: Execute a transfer from `alice` to `bob` for 30 tokens.
         - The transfer _could_ return an error. We should use `map_err` to print
-          the error if there is one.
+        the error if there is one.
         - We should capture the result of the transfer in an unused variable like `_res`.
     */
     let _res = runtime
