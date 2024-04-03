@@ -2,6 +2,30 @@ mod balances;
 mod support;
 mod system;
 
+// These are the concrete types we will use in our simple state machine.
+// Modules are configured for these types directly, and they satisfy all of our
+// trait requirements.
+mod types {
+    use crate::{support, RuntimeCall};
+
+    pub type AccountId = String;
+    pub type Balance = u128;
+    pub type BlockNumber = u32;
+    pub type Nonce = u32;
+    pub type Extrinsic = support::Extrinsic<AccountId, RuntimeCall>;
+    pub type Header = support::Block<BlockNumber, Extrinsic>;
+    pub type Block = support::Block<Header, Extrinsic>;
+    /* TODO: Define a concrete `Extrinsic` type using `AccountId` and `RuntimeCall`. */
+    /* TODO: Define a concrete `Header` type using `BlockNumber`. */
+    /* TODO: Define a concrete `Block` type using `Header` and `Extrinsic`. */
+}
+
+// These are all the calls which are exposed to the world.
+// Note that it is just an accumulation of the calls exposed by each module.
+pub enum RuntimeCall {
+    // TODO: Not implemented yet.
+}
+
 // This is our main Runtime.
 // It accumulates all of the different pallets we want to use.
 /* TODO: Add the derive macro to implement the `Debug` trait for `Runtime`. */
