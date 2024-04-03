@@ -42,7 +42,7 @@ impl<T: Config> Pallet<T> {
         caller: T::AccountId,
         to: T::AccountId,
         amount: T::Balance,
-    ) -> Result<(), &'static str> {
+    ) -> crate::support::DispatchResult {
         /* TODO:
             - Get the balance of account `caller`.
             - Get the balance of account `to`.
