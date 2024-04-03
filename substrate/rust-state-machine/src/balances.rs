@@ -2,8 +2,7 @@ use num::traits::{CheckedAdd, CheckedSub, Zero};
 use std::collections::BTreeMap;
 use std::marker::Copy;
 
-pub trait Config {
-    type AccountId: Ord + Clone;
+pub trait Config: crate::system::Config {
     type Balance: Zero + CheckedSub + CheckedAdd + Copy + std::cmp::PartialOrd;
 }
 /// This is the Balances Module.
@@ -86,8 +85,13 @@ mod tests {
     pub use crate::balances::Pallet;
 
     pub struct TestConfig;
-    impl super::Config for TestConfig {
+    impl crate::system::Config for TestConfig {
         type AccountId = String;
+        type BlockNumber = u32;
+        type Nonce = u32;
+    }
+
+    impl super::Config for TestConfig {
         type Balance = u128;
     }
 
