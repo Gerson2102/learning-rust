@@ -8,7 +8,7 @@ use crate::support::Dispatch;
 // Modules are configured for these types directly, and they satisfy all of our
 // trait requirements.
 mod types {
-    use crate::{support, RuntimeCall};
+    use crate::support;
 
     pub type AccountId = String;
     pub type Balance = u128;
@@ -25,10 +25,7 @@ mod types {
 // These are all the calls which are exposed to the world.
 // Note that it is just an accumulation of the calls exposed by each module.
 pub enum RuntimeCall {
-    BalancesTransfer {
-        to: types::AccountId,
-        amount: types::Balance,
-    },
+    Balances(balances::Call<Runtime>),
 }
 
 // This is our main Runtime.
@@ -119,8 +116,8 @@ impl crate::support::Dispatch for Runtime {
         // This match statement will allow us to correctly route `RuntimeCall`s
         // to the appropriate pallet level function.
         match runtime_call {
-            RuntimeCall::BalancesTransfer { to, amount } => {
-                self.balances.transfer(caller, to, amount)?;
+            RuntimeCall::Balances(call) => {
+                self.balances.dispatch(caller, call)?;
             }
         }
         Ok(())
@@ -137,13 +134,22 @@ fn main() {
 
     let block_1 = types::Block {
         header: support::Header { block_number: 1 },
-        extrinsics: vec![support::Extrinsic {
-            caller: "alice".to_string(),
-            call: RuntimeCall::BalancesTransfer {
-                to: "bob".to_string(),
-                amount: 69,
+        extrinsics: vec![
+            support::Extrinsic {
+                caller: "alice".to_string(),
+                call: RuntimeCall::Balances(balances::Call::Transfer {
+                    to: (bob),
+                    amount: (20),
+                }),
             },
-        }],
+            support::Extrinsic {
+                caller: "alice".to_string().clone(),
+                call: RuntimeCall::Balances(balances::Call::Transfer {
+                    to: (charlie),
+                    amount: (20),
+                }),
+            },
+        ],
     };
 
     runtime.execute_block(block_1).expect("invalid block");
