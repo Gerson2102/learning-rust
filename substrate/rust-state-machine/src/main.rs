@@ -116,7 +116,8 @@ impl crate::support::Dispatch for Runtime {
 
             You should propagate any errors from the call back up this function.
         */
-
+        // This match statement will allow us to correctly route `RuntimeCall`s
+        // to the appropriate pallet level function.
         match runtime_call {
             RuntimeCall::BalancesTransfer { to, amount } => {
                 self.balances.transfer(caller, to, amount)?;
@@ -129,36 +130,23 @@ impl crate::support::Dispatch for Runtime {
 fn main() {
     /* TODO: Create a mutable variable `runtime`, which is a new instance of `Runtime`. */
     let mut runtime = Runtime::new();
-    /* TODO: Set the balance of `alice` to 100, allowing us to execute other transactions. */
-    runtime.balances.set_balance(&"alice".to_string(), 100);
+    let alice = "alice".to_string();
+    let bob = "bob".to_string();
+    let charlie = "charlie".to_string();
+    runtime.balances.set_balance(&alice, 100);
 
-    // start emulating a block
-    /* TODO: Increment the block number in system. */
-    runtime.system.inc_block_number();
-    /* TODO: Assert the block number is what we expect. */
-    assert_eq!(runtime.system.block_number(), 1);
+    let block_1 = types::Block {
+        header: support::Header { block_number: 1 },
+        extrinsics: vec![support::Extrinsic {
+            caller: "alice".to_string(),
+            call: RuntimeCall::BalancesTransfer {
+                to: "bob".to_string(),
+                amount: 69,
+            },
+        }],
+    };
 
-    // first transaction
-    /* TODO: Increment the nonce of `alice`. */
-    runtime.system.inc_nonce(&"alice".to_string());
-    /* TODO: Execute a transfer from `alice` to `bob` for 30 tokens.
-        - The transfer _could_ return an error. We should use `map_err` to print
-        the error if there is one.
-        - We should capture the result of the transfer in an unused variable like `_res`.
-    */
-    let _res = runtime
-        .balances
-        .transfer("alice".to_string(), "bob".to_string(), 30)
-        .map_err(|e| eprintln!("{}", e));
-
-    // second transaction
-    /* TODO: Increment the nonce of `alice` again. */
-    runtime.system.inc_nonce(&"alice".to_string());
-    /* TODO: Execute another balance transfer, this time from `alice` to `charlie` for 20. */
-    let _res = runtime
-        .balances
-        .transfer("alice".to_string(), "charlie".to_string(), 20)
-        .map_err(|e| eprintln!("{}", e));
+    runtime.execute_block(block_1).expect("invalid block");
 
     println!("{:?}", runtime);
 }
