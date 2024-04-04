@@ -3,7 +3,7 @@ mod proof_of_existence;
 mod support;
 mod system;
 
-use crate::support::Dispatch;
+use crate::support::{Dispatch, DispatchResult};
 
 // These are the concrete types we will use in our simple state machine.
 // Modules are configured for these types directly, and they satisfy all of our
@@ -17,12 +17,14 @@ mod types {
     pub type Extrinsic = support::Extrinsic<AccountId, crate::RuntimeCall>;
     pub type Header = support::Header<BlockNumber>;
     pub type Block = support::Block<Header, Extrinsic>;
+    pub type Content = &'static str;
 }
 
 // These are all the calls which are exposed to the world.
 // Note that it is just an accumulation of the calls exposed by each module.
 pub enum RuntimeCall {
     Balances(balances::Call<Runtime>),
+    ProofOfExistence(proof_of_existence::Call<Runtime>),
 }
 
 // This is our main Runtime.
@@ -32,6 +34,7 @@ pub enum RuntimeCall {
 pub struct Runtime {
     system: system::Pallet<Self>,
     balances: balances::Pallet<Self>,
+    proof_of_existence: proof_of_existence::Pallet<Self>,
     /* TODO: Move your type definitions for `BlockNumber` and `Nonce` here. */
 }
 
@@ -45,12 +48,17 @@ impl balances::Config for Runtime {
     type Balance = u128;
 }
 
+impl proof_of_existence::Config for Runtime {
+    type Content = types::Content;
+}
+
 impl Runtime {
     // Create a new instance of the main Runtime, by creating a new instance of each pallet.
     fn new() -> Self {
         Self {
             system: system::Pallet::new(),
             balances: balances::Pallet::new(),
+            proof_of_existence: proof_of_existence::Pallet::new(),
         }
     }
 
@@ -86,7 +94,7 @@ impl Runtime {
     }
 }
 
-impl crate::support::Dispatch for Runtime {
+impl Dispatch for Runtime {
     type Caller = <Runtime as system::Config>::AccountId;
     type Call = RuntimeCall;
     // Dispatch a call on behalf of a caller. Increments the caller's nonce.
@@ -94,11 +102,7 @@ impl crate::support::Dispatch for Runtime {
     // Dispatch allows us to identify which underlying module call we want to execute.
     // Note that we extract the `caller` from the extrinsic, and use that information
     // to determine who we are executing the call on behalf of.
-    fn dispatch(
-        &mut self,
-        caller: Self::Caller,
-        runtime_call: Self::Call,
-    ) -> support::DispatchResult {
+    fn dispatch(&mut self, caller: Self::Caller, runtime_call: Self::Call) -> DispatchResult {
         /*
             TODO:
             Use a match statement to route the `runtime_call` to call the appropriate function in
@@ -115,6 +119,9 @@ impl crate::support::Dispatch for Runtime {
         match runtime_call {
             RuntimeCall::Balances(call) => {
                 self.balances.dispatch(caller, call)?;
+            }
+            RuntimeCall::ProofOfExistence(call) => {
+                self.proof_of_existence.dispatch(caller, call)?;
             }
         }
         Ok(())
