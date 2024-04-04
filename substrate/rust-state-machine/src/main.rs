@@ -156,7 +156,33 @@ fn main() {
         ],
     };
 
+    let block_2 = types::Block {
+        header: support::Header { block_number: 1 },
+        extrinsics: vec![
+            support::Extrinsic {
+                caller: "alice".to_string(),
+                call: RuntimeCall::ProofOfExistence(proof_of_existence::Call::CrateClaim {
+                    claim: (&"HELLO!"),
+                }),
+            },
+            support::Extrinsic {
+                caller: "bob".to_string().clone(),
+                call: RuntimeCall::ProofOfExistence(proof_of_existence::Call::RevokeClaim {
+                    claim: (&"HELLO!"),
+                }),
+            },
+        ],
+    };
+
+    /*
+        TODO:
+        Create new block(s) which execute extrinsics for the new `ProofOfExistence` pallet.
+            - Make sure to set the block number correctly.
+            - Feel free to allow some extrinsics to fail, and see the errors appear.
+    */
+
     runtime.execute_block(block_1).expect("invalid block");
+    runtime.execute_block(block_2).expect("invalid block");
 
     println!("{:?}", runtime);
 }
