@@ -10,7 +10,6 @@ use crate::support::Dispatch;
 // trait requirements.
 mod types {
     use crate::support;
-
     pub type AccountId = String;
     pub type Balance = u128;
     pub type BlockNumber = u32;
@@ -18,9 +17,6 @@ mod types {
     pub type Extrinsic = support::Extrinsic<AccountId, crate::RuntimeCall>;
     pub type Header = support::Header<BlockNumber>;
     pub type Block = support::Block<Header, Extrinsic>;
-    /* TODO: Define a concrete `Extrinsic` type using `AccountId` and `RuntimeCall`. */
-    /* TODO: Define a concrete `Header` type using `BlockNumber`. */
-    /* TODO: Define a concrete `Block` type using `Header` and `Extrinsic`. */
 }
 
 // These are all the calls which are exposed to the world.
