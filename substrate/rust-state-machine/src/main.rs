@@ -157,7 +157,7 @@ fn main() {
     };
 
     let block_2 = types::Block {
-        header: support::Header { block_number: 1 },
+        header: support::Header { block_number: 2 },
         extrinsics: vec![
             support::Extrinsic {
                 caller: "alice".to_string(),
