@@ -161,13 +161,13 @@ fn main() {
         extrinsics: vec![
             support::Extrinsic {
                 caller: "alice".to_string(),
-                call: RuntimeCall::ProofOfExistence(proof_of_existence::Call::CrateClaim {
+                call: RuntimeCall::ProofOfExistence(proof_of_existence::Call::create_claim {
                     claim: (&"HELLO!"),
                 }),
             },
             support::Extrinsic {
                 caller: "bob".to_string().clone(),
-                call: RuntimeCall::ProofOfExistence(proof_of_existence::Call::RevokeClaim {
+                call: RuntimeCall::ProofOfExistence(proof_of_existence::Call::revoke_claim {
                     claim: (&"HELLO!"),
                 }),
             },

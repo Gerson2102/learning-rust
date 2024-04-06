@@ -32,7 +32,9 @@ impl<T: Config> Pallet<T> {
         /* TODO: `get` the `claim` */
         self.claims.get(claim)
     }
-
+}
+#[macros::call]
+impl<T: Config> Pallet<T> {
     /// Create a new claim on behalf of the `caller`.
     /// This function will return an error if someone already has claimed that content.
     pub fn create_claim(&mut self, caller: T::AccountId, claim: T::Content) -> DispatchResult {
@@ -57,45 +59,6 @@ impl<T: Config> Pallet<T> {
         }
         /* TODO: If all checks pass, then `remove` the `claim`. */
         self.claims.remove(&claim);
-        Ok(())
-    }
-}
-
-pub enum Call<T: Config> {
-    /*
-        TODO:
-        Create variants for:
-        - `CreateClaim`
-        - `RevokeClaim`
-
-        Remember that you only need to pass in the `claim` data, as `caller` information is passed
-        in through the `dispatch` logic.
-    */
-    CrateClaim { claim: T::Content },
-    RevokeClaim { claim: T::Content },
-}
-
-impl<T: Config> Dispatch for Pallet<T> {
-    type Caller = T::AccountId;
-    type Call = Call<T>;
-    /*
-        TODO:
-        Implement `crate::support::Dispatch` for `Pallet<T>`.
-
-        In your `dispatch` logic, match on `call` and forward the `caller` and `claim` data to the
-        appropriate function.
-    */
-    fn dispatch(&mut self, caller: Self::Caller, call: Self::Call) -> DispatchResult {
-        /* TODO: use a `match` statement to route the `Call` to the appropriate pallet function. */
-
-        match call {
-            Call::CrateClaim { claim } => {
-                self.create_claim(caller, claim)?;
-            }
-            Call::RevokeClaim { claim } => {
-                self.revoke_claim(caller, claim)?;
-            }
-        }
         Ok(())
     }
 }
